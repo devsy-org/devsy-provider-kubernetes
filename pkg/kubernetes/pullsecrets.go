@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/skevetter/devpod-provider-kubernetes/pkg/docker"
+	"github.com/devsy-org/devsy-provider-kubernetes/pkg/docker"
 	k8sv1 "k8s.io/api/core/v1"
 )
 
@@ -143,7 +143,7 @@ func (k *KubernetesDriver) createPullSecret(
 	dockerCredentials *docker.Credentials,
 ) error {
 	authToken := dockerCredentials.AuthToken()
-	email := "noreply@loft.sh"
+	email := "noreply@devsy.sh"
 
 	encodedSecretData, err := PreparePullSecretData(dockerCredentials.ServerURL, authToken, email)
 	if err != nil {

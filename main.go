@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/skevetter/devpod-provider-kubernetes/cmd"
+	"github.com/devsy-org/devsy-provider-kubernetes/cmd"
 )
 
 func main() {

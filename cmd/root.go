@@ -4,8 +4,8 @@ import (
 	"os"
 	"os/exec"
 
+	log2 "github.com/devsy-org/log"
 	"github.com/sirupsen/logrus"
-	log2 "github.com/skevetter/log"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
 )
@@ -13,13 +13,13 @@ import (
 // NewRootCmd returns a new root command.
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "devpod-provider-kubernetes",
+		Use:           "devsy-provider-kubernetes",
 		Short:         "Kubernetes Provider commands",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 
 		PersistentPreRunE: func(cobraCmd *cobra.Command, args []string) error {
-			if os.Getenv("DEVPOD_DEBUG") == "true" {
+			if os.Getenv("DEVSY_DEBUG") == "true" {
 				log2.Default.SetLevel(logrus.DebugLevel)
 			}
 

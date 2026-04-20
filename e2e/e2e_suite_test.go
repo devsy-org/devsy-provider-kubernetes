@@ -3,9 +3,9 @@ package e2e
 import (
 	"testing"
 
+	_ "github.com/devsy-org/devsy-provider-kubernetes/e2e/pullsecrets" // Register tests.
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
-	_ "github.com/skevetter/devpod-provider-kubernetes/e2e/pullsecrets" // Register tests.
 )
 
 func TestRunE2ETests(t *testing.T) {

@@ -10,30 +10,30 @@ import (
 	"strconv"
 	"strings"
 
-	optionspkg "github.com/skevetter/devpod-provider-kubernetes/pkg/options"
-	"github.com/skevetter/devpod/pkg/devcontainer/config"
-	"github.com/skevetter/devpod/pkg/driver"
-	"github.com/skevetter/log"
+	optionspkg "github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
+	"github.com/devsy-org/devsy/pkg/devcontainer/config"
+	"github.com/devsy-org/devsy/pkg/driver"
+	"github.com/devsy-org/log"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 const (
-	DevContainerName  = "devpod"
-	InitContainerName = "devpod-init"
+	DevContainerName  = "devsy"
+	InitContainerName = "devsy-init"
 
 	trueStr    = "true"
 	volumeType = "volume"
 )
 
 const (
-	DevPodCreatedLabel      = "devpod.sh/created"
-	DevPodWorkspaceLabel    = "devpod.sh/workspace"
-	DevPodWorkspaceUIDLabel = "devpod.sh/workspace-uid"
+	DevPodCreatedLabel      = "devsy.sh/created"
+	DevPodWorkspaceLabel    = "devsy.sh/workspace"
+	DevPodWorkspaceUIDLabel = "devsy.sh/workspace-uid"
 
-	DevPodInfoAnnotation        = "devpod.sh/info"
-	DevPodLastAppliedAnnotation = "devpod.sh/last-applied-configuration"
+	DevPodInfoAnnotation        = "devsy.sh/info"
+	DevPodLastAppliedAnnotation = "devsy.sh/last-applied-configuration"
 )
 
 var ExtraDevPodLabels = map[string]string{
@@ -580,7 +580,7 @@ func mergeExistingContainer(devPodContainer, existing *corev1.Container) {
 func getVolumes(pod *corev1.Pod, id string) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
-			Name: "devpod",
+			Name: "devsy",
 			VolumeSource: corev1.VolumeSource{
 				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
 					ClaimName: id,
@@ -603,9 +603,9 @@ func getVolumeMount(idx int, mount *config.Mount) corev1.VolumeMount {
 	}
 
 	return corev1.VolumeMount{
-		Name:      "devpod",
+		Name:      "devsy",
 		MountPath: mount.Target,
-		SubPath:   fmt.Sprintf("devpod/%s", subPath),
+		SubPath:   fmt.Sprintf("devsy/%s", subPath),
 	}
 }
 
@@ -619,7 +619,7 @@ func getLabels(pod *corev1.Pod, rawLabels string) (map[string]string, error) {
 		}
 		maps.Copy(labels, extraLabels)
 	}
-	// make sure we don't overwrite the devpod labels
+	// make sure we don't overwrite the devsy labels
 	maps.Copy(labels, ExtraDevPodLabels)
 
 	return labels, nil
@@ -658,9 +658,9 @@ func (k *KubernetesDriver) StartDevContainer(ctx context.Context, workspaceId st
 }
 
 func getID(workspaceID string) string {
-	return "devpod-" + workspaceID
+	return "devsy-" + workspaceID
 }
 
 func getPullSecretsName(workspaceID string) string {
-	return fmt.Sprintf("devpod-pull-secret-%s", workspaceID)
+	return fmt.Sprintf("devsy-pull-secret-%s", workspaceID)
 }

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skevetter/devpod-provider-kubernetes/pkg/kubernetes"
-	"github.com/skevetter/devpod-provider-kubernetes/pkg/options"
-	"github.com/skevetter/log"
+	"github.com/devsy-org/devsy-provider-kubernetes/pkg/kubernetes"
+	"github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
+	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 )
 

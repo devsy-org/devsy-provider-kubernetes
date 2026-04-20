@@ -14,8 +14,8 @@ import (
 
 const (
 	providerName = "kubernetes"
-	githubOwner  = "skevetter"
-	githubRepo   = "devpod-provider-kubernetes"
+	githubOwner  = "devsy-org"
+	githubRepo   = "devsy-provider-kubernetes"
 )
 
 type Provider struct {
@@ -145,14 +145,14 @@ func buildProvider(cfg *buildConfig) Provider {
 	return Provider{
 		Name:         providerName,
 		Version:      cfg.version,
-		Icon:         "https://devpod.sh/assets/kubernetes.svg",
-		Home:         "https://github.com/skevetter/devpod",
-		Description:  "DevPod on Kubernetes",
+		Icon:         "https://raw.githubusercontent.com/devsy-org/devsy/main/desktop/src/images/kubernetes.svg",
+		Home:         "https://github.com/devsy-org/devsy",
+		Description:  "Devsy on Kubernetes",
 		OptionGroups: buildOptionGroups(),
 		Options:      buildOptions(),
 		Agent:        buildAgent(cfg),
 		Exec: map[string]string{
-			"command": "\"${DEVPOD}\" helper sh -c \"${COMMAND}\"",
+			"command": "\"${DEVSY}\" helper sh -c \"${COMMAND}\"",
 		},
 	}
 }
@@ -205,7 +205,7 @@ func buildCoreOptions() Options {
 			Description: "The kubernetes config to use. E.g. /path/to/my/kube/config.yaml",
 		},
 		"KUBERNETES_PULL_SECRETS_ENABLED": {
-			Description: "If true, DevPod will try to use the pull secrets from the current context.",
+			Description: "If true, Devsy will try to use the pull secrets from the current context.",
 			Default:     "true",
 			Type:        "boolean",
 			Global:      true,
@@ -221,7 +221,7 @@ func namespaceCommand() string {
 	return `NAMESPACE=$(${KUBECTL_PATH} config view --kubeconfig=${KUBERNETES_CONFIG}` +
 		` --context=${KUBERNETES_CONTEXT} --minify -o jsonpath='{..namespace}' 2>/dev/null || true)
 if [ -z "${NAMESPACE}" ]; then
-  NAMESPACE=devpod
+  NAMESPACE=devsy
 fi
 echo $NAMESPACE`
 }
@@ -229,21 +229,21 @@ echo $NAMESPACE`
 func buildK8sOptions() Options {
 	return Options{
 		"CREATE_NAMESPACE": {
-			Description: "If true, DevPod will try to create the namespace.",
+			Description: "If true, Devsy will try to create the namespace.",
 			Default:     "true",
 			Type:        "boolean",
 			Global:      true,
 		},
 		"CLUSTER_ROLE": {
-			Description: "If defined, DevPod will create a role binding for the given cluster role.",
+			Description: "If defined, Devsy will create a role binding for the given cluster role.",
 			Global:      true,
 		},
 		"SERVICE_ACCOUNT": {
-			Description: "If defined, DevPod will use the given service account for the dev container.",
+			Description: "If defined, Devsy will use the given service account for the dev container.",
 			Global:      true,
 		},
 		"HELPER_IMAGE": {
-			Description: "The image DevPod will use to find out the cluster architecture. Defaults to alpine.",
+			Description: "The image Devsy will use to find out the cluster architecture. Defaults to alpine.",
 			Global:      true,
 		},
 		"HELPER_RESOURCES": {
@@ -263,7 +263,7 @@ func buildK8sOptions() Options {
 			Default:     "10m",
 		},
 		"STORAGE_CLASS": {
-			Description: "If defined, DevPod will use the given storage class to create the persistent volume claim. " +
+			Description: "If defined, Devsy will use the given storage class to create the persistent volume claim. " +
 				"You will need to ensure the storage class exists in your cluster!",
 			Global: true,
 		},
@@ -273,12 +273,12 @@ func buildK8sOptions() Options {
 func buildAdvancedOptions() Options {
 	return Options{
 		"PVC_ACCESS_MODE": {
-			Description: "If defined, DevPod will use the given access mode to create the persistent volume claim. " +
+			Description: "If defined, Devsy will use the given access mode to create the persistent volume claim. " +
 				"You will need to ensure the storage class support the given access mode!. E.g. RWO or ROX or RWX or RWOP",
 			Global: true,
 		},
 		"PVC_ANNOTATIONS": {
-			Description: "If defined, DevPod will use add the given annotations to the main workspace pvc",
+			Description: "If defined, Devsy will use add the given annotations to the main workspace pvc",
 			Global:      true,
 		},
 		"NODE_SELECTOR": {
@@ -291,7 +291,7 @@ func buildAdvancedOptions() Options {
 			Global: true,
 		},
 		"POD_MANIFEST_TEMPLATE": {
-			Description: "Pod manifest template file path used as template to build the devpod pod. " +
+			Description: "Pod manifest template file path used as template to build the devsy pod. " +
 				"E.g. /path/pod_manifest.yaml. Alternatively can be an inline yaml string.",
 			Global: true,
 			Type:   "multiline",
@@ -303,7 +303,7 @@ func buildAdvancedOptions() Options {
 			Type:   "multiline",
 		},
 		"LABELS": {
-			Description: "The labels to use for the workspace pod. E.g. devpod.sh/example=value,devpod.sh/example2=value2",
+			Description: "The labels to use for the workspace pod. E.g. devsy.sh/example=value,devsy.sh/example2=value2",
 			Global:      true,
 		},
 		"DANGEROUSLY_OVERRIDE_IMAGE": {
@@ -338,9 +338,9 @@ func buildDockerlessOptions() Options {
 		},
 		"DOCKERLESS_DISABLED": {
 			Description: "If dockerless should be disabled. " +
-				"Dockerless is the way DevPod uses to build images directly " +
+				"Dockerless is the way Devsy uses to build images directly " +
 				"within Kubernetes. If dockerless is disabled and no image is specified, " +
-				"DevPod will fail instead.",
+				"Devsy will fail instead.",
 			Global:  true,
 			Default: "false",
 		},
@@ -395,7 +395,7 @@ func buildBinary(cfg *buildConfig, platform string) Binary {
 		}
 	}
 
-	filename := fmt.Sprintf("devpod-provider-%s-%s-%s", providerName, os, arch)
+	filename := fmt.Sprintf("devsy-provider-%s-%s-%s", providerName, os, arch)
 	if os == "windows" {
 		filename += ".exe"
 	}
