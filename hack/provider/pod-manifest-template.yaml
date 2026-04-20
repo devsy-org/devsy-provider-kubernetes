@@ -4,11 +4,11 @@ metadata:
   name: pod-template
 spec:
   containers:
-    - name: devpod
+    - name: devsy
       resources:
         requests:
           cpu: 2
       volumeMounts:
         - mountPath: /workspaces/.home
-          name: devpod
-          subPath: devpod/home
+          name: devsy
+          subPath: devsy/home

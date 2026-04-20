@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/skevetter/devpod/pkg/encoding"
-	"github.com/skevetter/devpod/pkg/random"
+	"github.com/devsy-org/devsy/pkg/encoding"
+	"github.com/devsy-org/devsy/pkg/random"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -70,7 +70,7 @@ func (k *KubernetesDriver) buildArchDetectionPod(
 	}
 
 	podName := encoding.SafeConcatNameMax(
-		[]string{"devpod", workspaceId, random.String(6)}, 32,
+		[]string{"devsy", workspaceId, random.String(6)}, 32,
 	)
 	pod.Namespace = k.namespace
 	pod.Name = podName

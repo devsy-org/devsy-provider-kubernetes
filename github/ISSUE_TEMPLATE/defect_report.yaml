@@ -7,11 +7,11 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
 
-        **NOTE** A large number of issues reported against DevPod Kubernetes provider are often found to already be fixed in more current versions of the product.  Before reporting an issue, please verify the version you are running with `devpod provider list` and compare it to the latest release. If they differ, please update your version of DevPod and the Kubernetes Provider to the latest possible and retry your command before creating an issue.
+        **NOTE** A large number of issues reported against Devsy Kubernetes provider are often found to already be fixed in more current versions of the product.  Before reporting an issue, please verify the version you are running with `devsy provider list` and compare it to the latest release. If they differ, please update your version of Devsy and the Kubernetes Provider to the latest possible and retry your command before creating an issue.
 
         Commands you might need to run to fill out the issue form:
-          $ devpod provider list
-          $ devpod provider update
+          $ devsy provider list
+          $ devsy provider update
   - type: textarea
     id: description
     attributes:
@@ -48,7 +48,7 @@ body:
     id: podman_info
     attributes:
       label: --debug output
-      description: "devpod --debug daemon-logs"
+      description: "devsy --debug daemon-logs"
       value: In case you use a Machine, provide operating system and its version and the architecture you are running.
       render: yaml
     validations:
@@ -57,7 +57,7 @@ body:
     id: operating_system
     attributes:
       label: Operating System
-      description: Please select the Operating System on which DevPod is installed
+      description: Please select the Operating System on which Devsy is installed
       options:
         - 'Linux'
         - 'MacOS'

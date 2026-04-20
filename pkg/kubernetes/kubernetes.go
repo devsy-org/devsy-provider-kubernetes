@@ -8,10 +8,10 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/skevetter/devpod-provider-kubernetes/pkg/options"
-	"github.com/skevetter/devpod/pkg/command"
-	"github.com/skevetter/devpod/pkg/driver"
-	"github.com/skevetter/log"
+	"github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
+	"github.com/devsy-org/devsy/pkg/command"
+	"github.com/devsy-org/devsy/pkg/driver"
+	"github.com/devsy-org/log"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -116,7 +116,7 @@ func (k *KubernetesDriver) CommandDevContainer(
 ) error {
 	workspaceId = getID(workspaceId)
 
-	args := []string{"exec", "-c", "devpod"}
+	args := []string{"exec", "-c", "devsy"}
 	if stdin != nil {
 		args = append(args, "-i")
 	}
@@ -138,7 +138,7 @@ func (k *KubernetesDriver) GetDevContainerLogs(
 ) error {
 	workspaceID = getID(workspaceID)
 
-	args := []string{"logs", "pods/" + workspaceID, "-c", "devpod"}
+	args := []string{"logs", "pods/" + workspaceID, "-c", "devsy"}
 
 	return k.runCommand(ctx, args, cmdIO{stdout: stdout, stderr: stderr})
 }
