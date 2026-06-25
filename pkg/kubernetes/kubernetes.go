@@ -11,11 +11,11 @@ import (
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
 	"github.com/devsy-org/devsy/pkg/command"
 	"github.com/devsy-org/devsy/pkg/driver"
-	"github.com/devsy-org/log"
+	"github.com/devsy-org/devsy/pkg/log"
 	corev1 "k8s.io/api/core/v1"
 )
 
-func NewKubernetesDriver(options *options.Options, log log.Logger) driver.Driver {
+func NewKubernetesDriver(options *options.Options) driver.Driver {
 	kubectl := "kubectl"
 	if options.KubectlPath != "" {
 		kubectl = options.KubectlPath
@@ -38,7 +38,6 @@ func NewKubernetesDriver(options *options.Options, log log.Logger) driver.Driver
 		namespace:  options.KubernetesNamespace,
 
 		options: options,
-		Log:     log,
 	}
 }
 
@@ -50,7 +49,6 @@ type KubernetesDriver struct {
 	context    string
 
 	options *options.Options
-	Log     log.Logger
 }
 
 func (k *KubernetesDriver) StopDevContainer(ctx context.Context, workspaceId string) error {
@@ -70,14 +68,14 @@ func (k *KubernetesDriver) DeleteDevContainer(ctx context.Context, workspaceId s
 	workspaceId = getID(workspaceId)
 
 	// delete pod
-	k.Log.Infof("Delete pod '%s'...", workspaceId)
+	log.Infof("Delete pod '%s'...", workspaceId)
 	err := k.deletePod(ctx, workspaceId)
 	if err != nil {
 		return err
 	}
 
 	// delete pvc
-	k.Log.Infof("Delete persistent volume claim '%s'...", workspaceId)
+	log.Infof("Delete persistent volume claim '%s'...", workspaceId)
 	out, err := k.buildCmd(ctx, []string{"delete", "pvc", workspaceId, "--ignore-not-found", "--grace-period=5"}).
 		CombinedOutput()
 	if err != nil {
@@ -86,7 +84,7 @@ func (k *KubernetesDriver) DeleteDevContainer(ctx context.Context, workspaceId s
 
 	// delete role binding & service account
 	if k.options.ClusterRole != "" {
-		k.Log.Infof("Delete role binding '%s'...", workspaceId)
+		log.Infof("Delete role binding '%s'...", workspaceId)
 		out, err := k.buildCmd(ctx, []string{"delete", "rolebinding", workspaceId, "--ignore-not-found"}).
 			CombinedOutput()
 		if err != nil {
@@ -96,7 +94,7 @@ func (k *KubernetesDriver) DeleteDevContainer(ctx context.Context, workspaceId s
 
 	// delete pull secret
 	if k.options.KubernetesPullSecretsEnabled != "" {
-		k.Log.Infof("Delete pull secret '%s'...", workspaceId)
+		log.Infof("Delete pull secret '%s'...", workspaceId)
 		err := k.DeletePullSecret(ctx, getPullSecretsName(workspaceId))
 		if err != nil {
 			return err
@@ -106,28 +104,28 @@ func (k *KubernetesDriver) DeleteDevContainer(ctx context.Context, workspaceId s
 	return nil
 }
 
-//nolint:revive // interface compliance
 func (k *KubernetesDriver) CommandDevContainer(
 	ctx context.Context,
-	workspaceId, user, command string,
-	stdin io.Reader,
-	stdout io.Writer,
-	stderr io.Writer,
+	params *driver.CommandParams,
 ) error {
-	workspaceId = getID(workspaceId)
+	workspaceId := getID(params.WorkspaceID)
 
 	args := []string{"exec", "-c", "devsy"}
-	if stdin != nil {
+	if params.Stdin != nil {
 		args = append(args, "-i")
 	}
 	args = append(args, workspaceId)
-	if user != "" && user != "root" {
-		args = append(args, "--", "su", user, "-c", command)
+	if params.User != "" && params.User != "root" {
+		args = append(args, "--", "su", params.User, "-c", params.Command)
 	} else {
-		args = append(args, "--", "sh", "-c", command)
+		args = append(args, "--", "sh", "-c", params.Command)
 	}
 
-	return k.runCommand(ctx, args, cmdIO{stdin: stdin, stdout: stdout, stderr: stderr})
+	return k.runCommand(
+		ctx,
+		args,
+		cmdIO{stdin: params.Stdin, stdout: params.Stdout, stderr: params.Stderr},
+	)
 }
 
 func (k *KubernetesDriver) GetDevContainerLogs(
@@ -204,7 +202,7 @@ func (k *KubernetesDriver) buildCmd(ctx context.Context, args []string) *exec.Cm
 		newArgs = append(newArgs, "--context", k.context)
 	}
 	newArgs = append(newArgs, args...)
-	k.Log.Debugf("Run command: %s %s", k.kubectl, strings.Join(newArgs, " "))
+	log.Debugf("Run command: %s %s", k.kubectl, strings.Join(newArgs, " "))
 	//nolint:gosec // kubectl path is from trusted configuration
 	return exec.CommandContext(ctx, k.kubectl, newArgs...)
 }

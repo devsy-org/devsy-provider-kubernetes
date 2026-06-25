@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/devsy-org/devsy/pkg/encoding"
+	"github.com/devsy-org/devsy/pkg/log"
 	"github.com/devsy-org/devsy/pkg/random"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +34,7 @@ func (k *KubernetesDriver) TargetArchitecture(
 
 func (k *KubernetesDriver) ensureNamespace(ctx context.Context) {
 	if k.namespace != "" && k.options.CreateNamespace == trueStr {
-		k.Log.Debugf("Create namespace '%s'", k.namespace)
+		log.Debugf("Create namespace '%s'", k.namespace)
 		buf := &bytes.Buffer{}
 		err := k.runCommand(
 			ctx,
@@ -41,7 +42,7 @@ func (k *KubernetesDriver) ensureNamespace(ctx context.Context) {
 			cmdIO{stdout: buf, stderr: buf},
 		)
 		if err != nil {
-			k.Log.Debugf("Error creating namespace: %s%v", buf.String(), err)
+			log.Debugf("Error creating namespace: %s%v", buf.String(), err)
 		}
 	}
 }
@@ -56,7 +57,7 @@ func (k *KubernetesDriver) buildArchDetectionPod(
 		},
 	}
 	if len(k.options.ArchDetectionPodManifestTemplate) > 0 {
-		k.Log.Debugf(
+		log.Debugf(
 			"trying to get arch detection pod template manifest from %s",
 			k.options.ArchDetectionPodManifestTemplate,
 		)
@@ -102,7 +103,7 @@ func (k *KubernetesDriver) detectArchitecture(
 		return "", err
 	}
 
-	k.Log.Infof("Find out cluster architecture...")
+	log.Infof("Find out cluster architecture...")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	err = k.runCommand(
@@ -117,7 +118,7 @@ func (k *KubernetesDriver) detectArchitecture(
 		)
 	}
 
-	k.Log.Infof("Waiting for cluster architecture job to come up...")
+	log.Infof("Waiting for cluster architecture job to come up...")
 	err = k.waitPodRunning(ctx, pod.Name)
 	if err != nil {
 		return "", fmt.Errorf(

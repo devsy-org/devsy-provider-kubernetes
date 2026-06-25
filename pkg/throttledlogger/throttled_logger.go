@@ -3,29 +3,27 @@ package throttledlogger
 import (
 	"time"
 
-	"github.com/devsy-org/log"
+	"github.com/devsy-org/devsy/pkg/log"
 )
 
 // ThrottledLogger is a logger that throttles the output,
 // i.e. it only logs a message if a certain amount of time has passed since the last log message.
 type ThrottledLogger struct {
-	logger log.Logger
-	timer  *Timer
+	timer *Timer
 }
 
-func NewThrottledLogger(logger log.Logger, throttlingInterval time.Duration) *ThrottledLogger {
+func NewThrottledLogger(throttlingInterval time.Duration) *ThrottledLogger {
 	return &ThrottledLogger{
-		logger: logger,
-		timer:  NewTimer(throttlingInterval),
+		timer: NewTimer(throttlingInterval),
 	}
 }
 
 func (t *ThrottledLogger) Infof(format string, args ...any) {
-	t.log(t.logger.Infof, format, args...)
+	t.log(log.Infof, format, args...)
 }
 
 func (t *ThrottledLogger) Debugf(format string, args ...any) {
-	t.log(t.logger.Debugf, format, args...)
+	t.log(log.Debugf, format, args...)
 }
 
 type LoggingFunc func(string, ...any)

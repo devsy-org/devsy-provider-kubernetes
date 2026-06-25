@@ -13,7 +13,7 @@ import (
 	optionspkg "github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
 	"github.com/devsy-org/devsy/pkg/devcontainer/config"
 	"github.com/devsy-org/devsy/pkg/driver"
-	"github.com/devsy-org/log"
+	"github.com/devsy-org/devsy/pkg/log"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -180,9 +180,9 @@ func (k *KubernetesDriver) resolveWorkspaceMount(
 
 		switch {
 		case err != nil:
-			k.Log.Warn("Relative filepath: %v", err)
+			log.Warnf("Relative filepath: %v", err)
 		case strings.HasPrefix(rel, ".."):
-			k.Log.Warnf(
+			log.Warnf(
 				"Workspace volume mount needs to be the same as the workspace mount or a parent, "+
 					"skipping option. WorkspaceVolumeMount: %s, MountTarget: %s",
 				k.options.WorkspaceVolumeMount,
@@ -190,7 +190,7 @@ func (k *KubernetesDriver) resolveWorkspaceMount(
 			)
 		default:
 			mount.Target = k.options.WorkspaceVolumeMount
-			k.Log.Debugf("Using workspace volume mount: %s", k.options.WorkspaceVolumeMount)
+			log.Debugf("Using workspace volume mount: %s", k.options.WorkspaceVolumeMount)
 		}
 	}
 	return mount, nil
@@ -217,7 +217,7 @@ func (k *KubernetesDriver) resolveMetadata(
 		return podMetadata{}, err
 	}
 
-	resources := resolveResources(pod, k.options.Resources, k.Log)
+	resources := resolveResources(pod, k.options.Resources)
 
 	return podMetadata{
 		labels:       labels,
@@ -237,7 +237,7 @@ func (k *KubernetesDriver) loadPodTemplate() (*corev1.Pod, error) {
 		},
 	}
 	if len(k.options.PodManifestTemplate) > 0 {
-		k.Log.Debugf("trying to get pod template manifest from %s", k.options.PodManifestTemplate)
+		log.Debugf("trying to get pod template manifest from %s", k.options.PodManifestTemplate)
 		return getPodTemplate(k.options.PodManifestTemplate)
 	}
 	return pod, nil
@@ -253,7 +253,7 @@ func (k *KubernetesDriver) buildVolumeMounts(
 		case "bind", volumeType:
 			volumeMounts = append(volumeMounts, getVolumeMount(idx+1, m))
 		default:
-			k.Log.Warnf(
+			log.Warnf(
 				"Unsupported mount type '%s' in mount '%s', will skip",
 				m.Type,
 				m.String(),
@@ -299,14 +299,13 @@ func (k *KubernetesDriver) setupServiceAccount(
 func resolveResources(
 	pod *corev1.Pod,
 	resourceStr string,
-	log log.Logger,
 ) corev1.ResourceRequirements {
 	resources := corev1.ResourceRequirements{}
 	if len(pod.Spec.Containers) > 0 {
 		resources = pod.Spec.Containers[0].Resources
 	}
 	if resourceStr != "" {
-		resources = parseResources(resourceStr, log)
+		resources = parseResources(resourceStr)
 	}
 	return resources
 }
@@ -337,7 +336,7 @@ func (k *KubernetesDriver) setupPodAffinity(
 		cmdIO{stdout: stdout, stderr: stderr},
 	)
 	if err != nil {
-		k.Log.Debugf(
+		log.Debugf(
 			"skipping finding cluster architecture: %s %s %w",
 			stdout.String(),
 			stderr.String(),
@@ -355,7 +354,7 @@ func (k *KubernetesDriver) setupPodAffinity(
 		return true
 	}
 
-	k.Log.Infof("Found architecture detecting pod: %s, using PodAffinity...", affinityPodID)
+	log.Infof("Found architecture detecting pod: %s, using PodAffinity...", affinityPodID)
 
 	if pod.Spec.Affinity == nil {
 		pod.Spec.Affinity = &corev1.Affinity{}
@@ -404,15 +403,15 @@ func (k *KubernetesDriver) checkExistingPod(
 		existingOptions,
 	)
 	if err != nil {
-		k.Log.Errorf("Error unmarshalling existing provider options, continuing...: %s", err)
+		log.Errorf("Error unmarshalling existing provider options, continuing...: %s", err)
 	}
 
 	if optionspkg.Equal(&existingOptions.ComparableOptions, &k.options.ComparableOptions) {
-		k.Log.Debug("Provider options did not change, skipping update")
+		log.Debug("Provider options did not change, skipping update")
 		return true, nil
 	}
 
-	k.Log.Debug("Provider options changed")
+	log.Debug("Provider options changed")
 	err = k.waitPodDeleted(ctx, id)
 	if err != nil {
 		return false, fmt.Errorf("stop devcontainer: %s: %w", id, err)
@@ -461,9 +460,9 @@ func (k *KubernetesDriver) runPod(
 		return err
 	}
 
-	k.Log.Debugf("Create pod with: %s", string(podRaw))
+	log.Debugf("Create pod with: %s", string(podRaw))
 	// create the pod
-	k.Log.Infof("Create Pod '%s'", id)
+	log.Infof("Create Pod '%s'", id)
 	buf := &bytes.Buffer{}
 	err = k.runCommand(
 		ctx,
@@ -475,14 +474,14 @@ func (k *KubernetesDriver) runPod(
 	}
 
 	// wait for pod running
-	k.Log.Infof("Waiting for DevContainer Pod '%s' to come up...", id)
+	log.Infof("Waiting for DevContainer Pod '%s' to come up...", id)
 	err = k.waitPodRunning(ctx, id)
 	if err != nil {
 		return err
 	}
 
 	if affinity {
-		k.Log.Infof("Cleaning up architecture detection pod")
+		log.Infof("Cleaning up architecture detection pod")
 		err := k.runCommand(
 			ctx,
 			[]string{"delete", "pods", "--force", "-l", DevPodWorkspaceLabel + "=" + id},

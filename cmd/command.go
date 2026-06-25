@@ -6,7 +6,7 @@ import (
 
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/kubernetes"
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
-	"github.com/devsy-org/log"
+	"github.com/devsy-org/devsy/pkg/driver"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +25,7 @@ func NewCommandCmd() *cobra.Command {
 				return err
 			}
 
-			return cmd.Run(context.Background(), options, log.Default.ErrorStreamOnly())
+			return cmd.Run(context.Background(), options)
 		},
 	}
 
@@ -33,14 +33,16 @@ func NewCommandCmd() *cobra.Command {
 }
 
 // Run runs the command logic.
-func (cmd *CommandCmd) Run(ctx context.Context, options *options.Options, log log.Logger) error {
-	return kubernetes.NewKubernetesDriver(options, log).CommandDevContainer(
+func (cmd *CommandCmd) Run(ctx context.Context, options *options.Options) error {
+	return kubernetes.NewKubernetesDriver(options).CommandDevContainer(
 		ctx,
-		options.DevContainerID,
-		os.Getenv("DEVCONTAINER_USER"),
-		os.Getenv("DEVCONTAINER_COMMAND"),
-		os.Stdin,
-		os.Stdout,
-		os.Stderr,
+		&driver.CommandParams{
+			WorkspaceID: options.DevContainerID,
+			User:        os.Getenv("DEVCONTAINER_USER"),
+			Command:     os.Getenv("DEVCONTAINER_COMMAND"),
+			Stdin:       os.Stdin,
+			Stdout:      os.Stdout,
+			Stderr:      os.Stderr,
+		},
 	)
 }

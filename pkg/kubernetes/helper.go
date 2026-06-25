@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/devsy-org/log"
+	"github.com/devsy-org/devsy/pkg/log"
 	"github.com/ghodss/yaml"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -17,7 +17,7 @@ const (
 	requestsPrefix = "requests."
 )
 
-func parseResources(resourceString string, log log.Logger) corev1.ResourceRequirements {
+func parseResources(resourceString string) corev1.ResourceRequirements {
 	resourcesSplitted := strings.Split(resourceString, ",")
 	requests := corev1.ResourceList{}
 	limits := corev1.ResourceList{}

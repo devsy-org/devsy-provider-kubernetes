@@ -1,24 +1,17 @@
 package throttledlogger
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/devsy-org/log"
+	"github.com/devsy-org/devsy/pkg/log"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap/zapcore"
 )
 
-type MockLogger struct {
-	log.Logger
-	Messages []string
-}
-
-func (m *MockLogger) Infof(format string, args ...any) {
-	m.Messages = append(m.Messages, fmt.Sprintf(format, args...))
-}
-
 func TestThrottledLogger(t *testing.T) {
+	logs := log.InitTestObserved(t, zapcore.InfoLevel)
+
 	now := time.Now()
 	interval := time.Millisecond * 50
 	timer := &Timer{
@@ -26,20 +19,17 @@ func TestThrottledLogger(t *testing.T) {
 		tickInterval: interval,
 	}
 
-	mockLogger := &MockLogger{}
-
 	tLogger := &ThrottledLogger{
-		logger: mockLogger, // Note: Assuming that the type of log.Logger is compatible.
-		timer:  timer,
+		timer: timer,
 	}
 
 	// Test: When timer indicates that interval hasn't passed
 	tLogger.Infof("This is a test %s", "message")
-	assert.Len(t, mockLogger.Messages, 0) // No log should be recorded
+	assert.Equal(t, 0, logs.Len()) // No log should be recorded
 
 	// Test: When timer indicates that interval has passed
 	time.Sleep(interval + time.Millisecond*1)
 	tLogger.Infof("This is another test %s", "message")
-	assert.Len(t, mockLogger.Messages, 1)
-	assert.Equal(t, "This is another test message", mockLogger.Messages[0])
+	assert.Equal(t, 1, logs.Len())
+	assert.Equal(t, "This is another test message", logs.All()[0].Message)
 }

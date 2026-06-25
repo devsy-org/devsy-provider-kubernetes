@@ -103,7 +103,7 @@ func (k *KubernetesDriver) buildInitContainer(
 		resources = existing.Resources
 	}
 	if k.options.HelperResources != "" {
-		resources = parseResources(k.options.HelperResources, k.Log)
+		resources = parseResources(k.options.HelperResources)
 	}
 
 	initContainer := corev1.Container{
