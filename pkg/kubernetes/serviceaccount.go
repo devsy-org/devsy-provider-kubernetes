@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/devsy-org/devsy/pkg/command"
+	"github.com/devsy-org/devsy/pkg/log"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -63,7 +64,7 @@ func (k *KubernetesDriver) ensureServiceAccount(
 		return err
 	}
 
-	k.Log.Infof("Create Service Account '%s'", serviceAccount)
+	log.Infof("Create Service Account '%s'", serviceAccount)
 	buf := &bytes.Buffer{}
 	err = k.runCommand(
 		ctx,
@@ -122,7 +123,7 @@ func (k *KubernetesDriver) ensureRoleBinding(
 		return err
 	}
 
-	k.Log.Infof("Create Role Binding '%s'", serviceAccount)
+	log.Infof("Create Role Binding '%s'", serviceAccount)
 	buf := &bytes.Buffer{}
 	err = k.runCommand(
 		ctx,

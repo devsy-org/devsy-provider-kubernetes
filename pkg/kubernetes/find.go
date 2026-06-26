@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/devsy-org/devsy/pkg/devcontainer/config"
+	"github.com/devsy-org/devsy/pkg/log"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -23,8 +24,8 @@ func (k *KubernetesDriver) FindDevContainer(
 	// check pod
 	pod, err := k.getPod(ctx, pvc.Name)
 	if err != nil {
-		k.Log.Infof("Error finding pod: %v", err)
-		k.Log.Warn(
+		log.Infof("Error finding pod: %v", err)
+		log.Warn(
 			"If the pod does not come up automatically it is stuck in an error state. " +
 				"Recreate the workspace to recover from this",
 		)

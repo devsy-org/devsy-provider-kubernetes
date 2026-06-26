@@ -10,7 +10,6 @@ import (
 
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/kubernetes"
 	options2 "github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
-	"github.com/devsy-org/log"
 	. "github.com/onsi/ginkgo/v2" //nolint:staticcheck // ginkgo/gomega convention
 	. "github.com/onsi/gomega"    //nolint:staticcheck // ginkgo/gomega convention
 	v1 "k8s.io/api/core/v1"
@@ -173,7 +172,7 @@ func prepareK8sDriver(namespace string) *kubernetes.KubernetesDriver {
 		KubernetesNamespace: namespace,
 	}
 	driver := kubernetes.NewKubernetesDriver(
-		&options, log.Default.ErrorStreamOnly()).(*kubernetes.KubernetesDriver)
+		&options).(*kubernetes.KubernetesDriver)
 	return driver
 }
 

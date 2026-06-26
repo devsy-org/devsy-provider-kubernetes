@@ -9,7 +9,6 @@ import (
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/kubernetes"
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
 	"github.com/devsy-org/devsy/pkg/driver"
-	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +27,7 @@ func NewRunCmd() *cobra.Command {
 				return err
 			}
 
-			return cmd.Run(context.Background(), options, log.Default)
+			return cmd.Run(context.Background(), options)
 		},
 	}
 
@@ -36,7 +35,7 @@ func NewRunCmd() *cobra.Command {
 }
 
 // Run runs the command logic.
-func (cmd *RunCmd) Run(ctx context.Context, options *options.Options, log log.Logger) error {
+func (cmd *RunCmd) Run(ctx context.Context, options *options.Options) error {
 	var runOptions *driver.RunOptions
 
 	runOptsEnv := os.Getenv("DEVCONTAINER_RUN_OPTIONS")
@@ -48,6 +47,6 @@ func (cmd *RunCmd) Run(ctx context.Context, options *options.Options, log log.Lo
 		}
 	}
 
-	return kubernetes.NewKubernetesDriver(options, log).
+	return kubernetes.NewKubernetesDriver(options).
 		RunDevContainer(ctx, options.DevContainerID, runOptions)
 }

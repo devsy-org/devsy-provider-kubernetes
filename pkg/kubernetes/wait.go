@@ -9,6 +9,7 @@ import (
 
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/throttledlogger"
 	"github.com/devsy-org/devsy/pkg/command"
+	"github.com/devsy-org/devsy/pkg/log"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
@@ -28,7 +29,7 @@ func (k *KubernetesDriver) waitPodRunning(ctx context.Context, id string) error 
 	wc := podWaitContext{
 		id:              id,
 		started:         time.Now(),
-		throttledLogger: throttledlogger.NewThrottledLogger(k.Log, time.Second*5),
+		throttledLogger: throttledlogger.NewThrottledLogger(time.Second * 5),
 	}
 
 	var pod *corev1.Pod
@@ -175,7 +176,7 @@ func (k *KubernetesDriver) checkSingleContainer(
 	wc *podWaitContext,
 ) (bool, error) {
 	if IsTerminated(c) && Succeeded(c) {
-		k.Log.Debugf("Delete Pod '%s' because it is succeeded", wc.id)
+		log.Debugf("Delete Pod '%s' because it is succeeded", wc.id)
 		err := k.deletePod(ctx, wc.id)
 		if err != nil {
 			return false, err
