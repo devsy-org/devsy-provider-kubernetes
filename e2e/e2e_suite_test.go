@@ -10,5 +10,5 @@ import (
 
 func TestRunE2ETests(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "Devpod provider kubernetes e2e suite")
+	ginkgo.RunSpecs(t, "Devsy provider kubernetes e2e suite")
 }

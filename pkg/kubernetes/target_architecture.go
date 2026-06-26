@@ -81,7 +81,7 @@ func (k *KubernetesDriver) buildArchDetectionPod(
 		pod.Labels = map[string]string{}
 	}
 	maps.Copy(labels, pod.Labels)
-	labels[DevPodWorkspaceLabel] = workspaceId
+	labels[DevsyWorkspaceLabel] = workspaceId
 	pod.Labels = labels
 
 	pod.Spec.RestartPolicy = corev1.RestartPolicyNever
@@ -161,43 +161,43 @@ func getArchitectureDetectionPodContainers(
 	imageName string,
 	args []string,
 ) []corev1.Container {
-	devPodContainer := corev1.Container{
+	devsyContainer := corev1.Container{
 		Name:  DevContainerName,
 		Image: imageName,
 		Args:  args,
 	}
 
 	// merge with existing container if it exists
-	var existingDevPodContainer *corev1.Container
+	var existingDevsyContainer *corev1.Container
 	retContainers := []corev1.Container{}
 	if pod != nil {
 		for i, container := range pod.Spec.Containers {
 			if container.Name == DevContainerName {
-				existingDevPodContainer = &pod.Spec.Containers[i]
+				existingDevsyContainer = &pod.Spec.Containers[i]
 			} else {
 				retContainers = append(retContainers, container)
 			}
 		}
 	}
 
-	if existingDevPodContainer != nil {
-		devPodContainer.Env = append(
-			existingDevPodContainer.Env, devPodContainer.Env...,
+	if existingDevsyContainer != nil {
+		devsyContainer.Env = append(
+			existingDevsyContainer.Env, devsyContainer.Env...,
 		)
-		devPodContainer.EnvFrom = existingDevPodContainer.EnvFrom
-		devPodContainer.Ports = existingDevPodContainer.Ports
-		devPodContainer.VolumeMounts = append(
-			existingDevPodContainer.VolumeMounts,
-			devPodContainer.VolumeMounts...)
-		devPodContainer.ImagePullPolicy = existingDevPodContainer.ImagePullPolicy
-		devPodContainer.Resources = existingDevPodContainer.Resources
+		devsyContainer.EnvFrom = existingDevsyContainer.EnvFrom
+		devsyContainer.Ports = existingDevsyContainer.Ports
+		devsyContainer.VolumeMounts = append(
+			existingDevsyContainer.VolumeMounts,
+			devsyContainer.VolumeMounts...)
+		devsyContainer.ImagePullPolicy = existingDevsyContainer.ImagePullPolicy
+		devsyContainer.Resources = existingDevsyContainer.Resources
 
-		if devPodContainer.SecurityContext == nil &&
-			existingDevPodContainer.SecurityContext != nil {
-			devPodContainer.SecurityContext = existingDevPodContainer.SecurityContext
+		if devsyContainer.SecurityContext == nil &&
+			existingDevsyContainer.SecurityContext != nil {
+			devsyContainer.SecurityContext = existingDevsyContainer.SecurityContext
 		}
 	}
-	retContainers = append(retContainers, devPodContainer)
+	retContainers = append(retContainers, devsyContainer)
 
 	return retContainers
 }

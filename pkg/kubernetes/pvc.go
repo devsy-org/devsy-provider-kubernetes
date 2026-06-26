@@ -63,10 +63,10 @@ func (k *KubernetesDriver) buildPersistentVolumeClaim(
 	if err != nil {
 		return "", err
 	}
-	labels := map[string]string{DevPodWorkspaceUIDLabel: options.UID}
-	maps.Copy(labels, ExtraDevPodLabels)
+	labels := map[string]string{DevsyWorkspaceUIDLabel: options.UID}
+	maps.Copy(labels, ExtraDevsyLabels)
 
-	annotations := map[string]string{DevPodInfoAnnotation: containerInfo}
+	annotations := map[string]string{DevsyInfoAnnotation: containerInfo}
 	extraAnnotations, err := parseLabels(k.options.PvcAnnotations)
 	if err != nil {
 		log.Errorf("Failed to parse annotations from PVC_ANNOTATIONS option: %v", err)

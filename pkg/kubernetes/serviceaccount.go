@@ -57,7 +57,7 @@ func (k *KubernetesDriver) ensureServiceAccount(
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   serviceAccount,
-			Labels: ExtraDevPodLabels,
+			Labels: ExtraDevsyLabels,
 		},
 	})
 	if err != nil {
@@ -105,7 +105,7 @@ func (k *KubernetesDriver) ensureRoleBinding(
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   id,
-			Labels: ExtraDevPodLabels,
+			Labels: ExtraDevsyLabels,
 		},
 		Subjects: []rbacv1.Subject{
 			{
