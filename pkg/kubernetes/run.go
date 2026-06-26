@@ -25,19 +25,22 @@ const (
 
 	trueStr    = "true"
 	volumeType = "volume"
+
+	kubectlGet    = "get"
+	kubectlDelete = "delete"
 )
 
 const (
-	DevPodCreatedLabel      = "devsy.sh/created"
-	DevPodWorkspaceLabel    = "devsy.sh/workspace"
-	DevPodWorkspaceUIDLabel = "devsy.sh/workspace-uid"
+	DevsyCreatedLabel      = "devsy.sh/created"
+	DevsyWorkspaceLabel    = "devsy.sh/workspace"
+	DevsyWorkspaceUIDLabel = "devsy.sh/workspace-uid"
 
-	DevPodInfoAnnotation        = "devsy.sh/info"
-	DevPodLastAppliedAnnotation = "devsy.sh/last-applied-configuration"
+	DevsyInfoAnnotation        = "devsy.sh/info"
+	DevsyLastAppliedAnnotation = "devsy.sh/last-applied-configuration"
 )
 
-var ExtraDevPodLabels = map[string]string{
-	DevPodCreatedLabel: trueStr,
+var ExtraDevsyLabels = map[string]string{
+	DevsyCreatedLabel: trueStr,
 }
 
 type DevContainerInfo struct {
@@ -210,7 +213,7 @@ func (k *KubernetesDriver) resolveMetadata(
 	if err != nil {
 		return podMetadata{}, err
 	}
-	labels[DevPodWorkspaceUIDLabel] = uid
+	labels[DevsyWorkspaceUIDLabel] = uid
 
 	nodeSelector, err := getNodeSelector(pod, k.options.NodeSelector)
 	if err != nil {
@@ -332,7 +335,7 @@ func (k *KubernetesDriver) setupPodAffinity(
 
 	err := k.runCommand(
 		ctx,
-		[]string{"get", "pods", "-o=name", "-l", DevPodWorkspaceLabel + "=" + id},
+		[]string{kubectlGet, "pods", "-o=name", "-l", DevsyWorkspaceLabel + "=" + id},
 		cmdIO{stdout: stdout, stderr: stderr},
 	)
 	if err != nil {
@@ -371,7 +374,7 @@ func (k *KubernetesDriver) setupPodAffinity(
 			LabelSelector: &metav1.LabelSelector{
 				MatchExpressions: []metav1.LabelSelectorRequirement{
 					{
-						Key:      DevPodWorkspaceLabel,
+						Key:      DevsyWorkspaceLabel,
 						Operator: metav1.LabelSelectorOpIn,
 						Values:   []string{id},
 					},
@@ -399,7 +402,7 @@ func (k *KubernetesDriver) checkExistingPod(
 
 	existingOptions := &optionspkg.Options{}
 	err = json.Unmarshal(
-		[]byte(existingPod.GetAnnotations()[DevPodLastAppliedAnnotation]),
+		[]byte(existingPod.GetAnnotations()[DevsyLastAppliedAnnotation]),
 		existingOptions,
 	)
 	if err != nil {
@@ -452,7 +455,7 @@ func (k *KubernetesDriver) runPod(
 	if pod.Annotations == nil {
 		pod.Annotations = map[string]string{}
 	}
-	pod.Annotations[DevPodLastAppliedAnnotation] = string(lastAppliedConfigRaw)
+	pod.Annotations[DevsyLastAppliedAnnotation] = string(lastAppliedConfigRaw)
 
 	// marshal the pod
 	podRaw, err := json.Marshal(pod)
@@ -484,7 +487,7 @@ func (k *KubernetesDriver) runPod(
 		log.Infof("Cleaning up architecture detection pod")
 		err := k.runCommand(
 			ctx,
-			[]string{"delete", "pods", "--force", "-l", DevPodWorkspaceLabel + "=" + id},
+			[]string{kubectlDelete, "pods", "--force", "-l", DevsyWorkspaceLabel + "=" + id},
 			cmdIO{stdout: buf, stderr: buf},
 		)
 		if err != nil {
@@ -512,7 +515,7 @@ func getContainers(
 	pod *corev1.Pod,
 	cfg containerConfig,
 ) []corev1.Container {
-	devPodContainer := corev1.Container{
+	devsyContainer := corev1.Container{
 		Name:         DevContainerName,
 		Image:        cfg.imageName,
 		Command:      []string{cfg.entrypoint},
@@ -530,19 +533,19 @@ func getContainers(
 	}
 
 	if cfg.overrideImage != "" {
-		devPodContainer.Image = cfg.overrideImage
+		devsyContainer.Image = cfg.overrideImage
 	}
 
 	if cfg.strictSecurity {
-		devPodContainer.SecurityContext = nil
+		devsyContainer.SecurityContext = nil
 	}
 
-	retContainers, existingDevPodContainer := splitExistingContainer(pod)
+	retContainers, existingDevsyContainer := splitExistingContainer(pod)
 
-	if existingDevPodContainer != nil {
-		mergeExistingContainer(&devPodContainer, existingDevPodContainer)
+	if existingDevsyContainer != nil {
+		mergeExistingContainer(&devsyContainer, existingDevsyContainer)
 	}
-	retContainers = append(retContainers, devPodContainer)
+	retContainers = append(retContainers, devsyContainer)
 
 	return retContainers
 }
@@ -562,17 +565,17 @@ func splitExistingContainer(pod *corev1.Pod) ([]corev1.Container, *corev1.Contai
 	return retContainers, existing
 }
 
-func mergeExistingContainer(devPodContainer, existing *corev1.Container) {
-	devPodContainer.Env = append(existing.Env, devPodContainer.Env...)
-	devPodContainer.EnvFrom = existing.EnvFrom
-	devPodContainer.Ports = existing.Ports
-	devPodContainer.VolumeMounts = append(
+func mergeExistingContainer(devsyContainer, existing *corev1.Container) {
+	devsyContainer.Env = append(existing.Env, devsyContainer.Env...)
+	devsyContainer.EnvFrom = existing.EnvFrom
+	devsyContainer.Ports = existing.Ports
+	devsyContainer.VolumeMounts = append(
 		existing.VolumeMounts,
-		devPodContainer.VolumeMounts...)
-	devPodContainer.ImagePullPolicy = existing.ImagePullPolicy
+		devsyContainer.VolumeMounts...)
+	devsyContainer.ImagePullPolicy = existing.ImagePullPolicy
 
-	if devPodContainer.SecurityContext == nil && existing.SecurityContext != nil {
-		devPodContainer.SecurityContext = existing.SecurityContext
+	if devsyContainer.SecurityContext == nil && existing.SecurityContext != nil {
+		devsyContainer.SecurityContext = existing.SecurityContext
 	}
 }
 
@@ -619,7 +622,7 @@ func getLabels(pod *corev1.Pod, rawLabels string) (map[string]string, error) {
 		maps.Copy(labels, extraLabels)
 	}
 	// make sure we don't overwrite the devsy labels
-	maps.Copy(labels, ExtraDevPodLabels)
+	maps.Copy(labels, ExtraDevsyLabels)
 
 	return labels, nil
 }
