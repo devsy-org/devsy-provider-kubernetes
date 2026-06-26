@@ -25,6 +25,9 @@ const (
 
 	trueStr    = "true"
 	volumeType = "volume"
+
+	kubectlGet    = "get"
+	kubectlDelete = "delete"
 )
 
 const (
@@ -332,7 +335,7 @@ func (k *KubernetesDriver) setupPodAffinity(
 
 	err := k.runCommand(
 		ctx,
-		[]string{"get", "pods", "-o=name", "-l", DevsyWorkspaceLabel + "=" + id},
+		[]string{kubectlGet, "pods", "-o=name", "-l", DevsyWorkspaceLabel + "=" + id},
 		cmdIO{stdout: stdout, stderr: stderr},
 	)
 	if err != nil {
@@ -484,7 +487,7 @@ func (k *KubernetesDriver) runPod(
 		log.Infof("Cleaning up architecture detection pod")
 		err := k.runCommand(
 			ctx,
-			[]string{"delete", "pods", "--force", "-l", DevsyWorkspaceLabel + "=" + id},
+			[]string{kubectlDelete, "pods", "--force", "-l", DevsyWorkspaceLabel + "=" + id},
 			cmdIO{stdout: buf, stderr: buf},
 		)
 		if err != nil {
