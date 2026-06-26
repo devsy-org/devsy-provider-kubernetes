@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/devsy-org/devsy-provider-kubernetes/compare/v1.1.0...v1.2.0) (2026-06-26)
+
+
+### Miscellaneous Chores
+
+* release 1.2.0 ([#16](https://github.com/devsy-org/devsy-provider-kubernetes/issues/16)) ([68edf66](https://github.com/devsy-org/devsy-provider-kubernetes/commit/68edf660ce477ec18e77a24b5aed9168f8e53896))
+
 ## [1.1.0](https://github.com/devsy-org/devsy-provider-kubernetes/compare/v1.0.0...v1.1.0) (2026-04-20)
 
 
