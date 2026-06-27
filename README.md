@@ -22,7 +22,7 @@ devsy provider set-options kubernetes -o DISK_SIZE=20Gi -o KUBERNETES_NAMESPACE=
 After the initial setup, just use:
 
 ```sh
-devsy up .
+devsy workspace up .
 ```
 
 You'll need to wait for the pod and workspace setup.
