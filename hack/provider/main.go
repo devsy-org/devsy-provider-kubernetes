@@ -145,7 +145,7 @@ func buildProvider(cfg *buildConfig) Provider {
 	return Provider{
 		Name:         providerName,
 		Version:      cfg.version,
-		Icon:         "https://raw.githubusercontent.com/devsy-org/devsy/main/desktop/src/images/kubernetes.svg",
+		Icon:         "https://raw.githubusercontent.com/devsy-org/devsy/main/desktop/src/renderer/public/icons/providers/kubernetes.svg",
 		Home:         "https://github.com/devsy-org/devsy",
 		Description:  "Devsy on Kubernetes",
 		OptionGroups: buildOptionGroups(),
