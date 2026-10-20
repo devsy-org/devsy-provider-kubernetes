@@ -1,6 +1,6 @@
 module github.com/devsy-org/devsy-provider-kubernetes
 
-go 1.26.0
+go 1.26.10
 
 require (
 	github.com/devsy-org/devsy v1.0.0
