@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
-	"strings"
 
 	"github.com/devsy-org/devsy-provider-kubernetes/pkg/options"
 	"github.com/devsy-org/devsy/pkg/command"
@@ -202,7 +201,7 @@ func (k *KubernetesDriver) buildCmd(ctx context.Context, args []string) *exec.Cm
 		newArgs = append(newArgs, "--context", k.context)
 	}
 	newArgs = append(newArgs, args...)
-	log.Debugf("Run command: %s %s", k.kubectl, strings.Join(newArgs, " "))
+	log.Debug("Run kubectl command")
 	//nolint:gosec // kubectl path is from trusted configuration
 	return exec.CommandContext(ctx, k.kubectl, newArgs...)
 }

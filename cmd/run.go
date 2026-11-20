@@ -47,6 +47,9 @@ func (cmd *RunCmd) Run(ctx context.Context, options *options.Options) error {
 		}
 	}
 
-	return kubernetes.NewKubernetesDriver(options).
-		RunDevContainer(ctx, options.DevContainerID, runOptions)
+	runDriver, ok := kubernetes.NewKubernetesDriver(options).(driver.RunOptionsDriver)
+	if !ok {
+		return fmt.Errorf("kubernetes driver does not support run options")
+	}
+	return runDriver.RunDevContainer(ctx, options.DevContainerID, runOptions)
 }

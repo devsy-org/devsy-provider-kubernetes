@@ -1,16 +1,16 @@
 package throttledlogger
 
 import (
+	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/devsy-org/devsy/pkg/log"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap/zapcore"
 )
 
 func TestThrottledLogger(t *testing.T) {
-	logs := log.InitTestObserved(t, zapcore.InfoLevel)
+	logs := log.InitTestObserved(t, slog.LevelInfo)
 
 	now := time.Now()
 	interval := time.Millisecond * 50

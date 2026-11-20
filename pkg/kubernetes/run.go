@@ -340,7 +340,7 @@ func (k *KubernetesDriver) setupPodAffinity(
 	)
 	if err != nil {
 		log.Debugf(
-			"skipping finding cluster architecture: %s %s %w",
+			"skipping finding cluster architecture: %s %s %v",
 			stdout.String(),
 			stderr.String(),
 			err,
