@@ -27,6 +27,12 @@ devsy workspace up .
 
 You'll need to wait for the pod and workspace setup.
 
+### Logging
+
+The provider writes diagnostic logs to stderr as JSON by default. `DEVSY_LOG_LEVEL` accepts `error`, `warn`, `info`, `debug`, and `trace`, ignoring letter case. A standalone provider defaults to `info`. Devsy passes its effective log level to the provider.
+
+`DEVSY_LOG_FORMAT` accepts `auto`, `json`, `text`, `plain`, and `logfmt`, ignoring letter case. The `auto` format uses JSON for provider diagnostics. Protocol output and remote command streams remain separate from diagnostic logs.
+
 ### Customize the Provider
 
 This provider has the following options:
